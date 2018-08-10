@@ -19,13 +19,13 @@ p(RC) = 0.3 , p(TC) = 0.7 , p(Y) = 0.65 , p(N) = 0.35
 
 P(Y|TC) = ?
 
-***According to Baye's Theorem:*** $p(x|y) = \\frac{p(y|x)p(x)}{p(y)}$
+***According to Baye's Theorem:*** p(x|y) = p(y|x)p(x)/p(y)
 
-Therefore, $p(Y|TC) = \\frac{p(TC|Y)p(Y)}{p(TC)}$
+Therefore, p(Y|TC) = p(TC|Y)p(Y)/p(TC)
 
 *Where:* p(TC|Y) = 1 - p(RC|Y)
 
-$p(RC|Y) = \\frac{p(TC|Y)p(Y)}{p(TC)}$
+p(RC|Y) = p(TC|Y)p(Y)/p(TC)
 
 p(RC|Y) = (0.3 x 0.5) / 0.65 = 0.23
 
@@ -63,26 +63,22 @@ p(D) = 0.000025
 
 P(D|TP) = ?
 
-***According to Baye's Theorem:*** $p(x|y) = \\frac{p(y|x)p(x)}{p(y)}$
+***According to Baye's Theorem:*** p(x|y) = p(y|x)p(x)/p(y)
 
-Therefore, $p(D|P) = \\frac{p(P|D)p(D)}{p(P)}$
+Therefore, p(D|P) = p(P|D)p(D)/p(P)
 
 *Where:* p(P) = p(P|D)p(D) + p(P|H)p(H)
 
 p(P|H) = 1- p(N|H)
 
-Therefore, $p(D|P) = \\frac{p(P|D)p(D)}{p(P|D)p(D) + (1 - p(N|H))p(H)}$
+Therefore, p(D|P) = p(P|D)p(D)/(p(P|D)p(D) + (1 - p(N|H))p(H))
 
 ***p(D|P) = (0.993 X 0.000025)/((0.993 X 0.000025) + ((1-0.9999)X(1 - 0.000025))) = 0.1988 ***
 
 The probability of having a disease given you have tested positive is only 20% So even if you have tested positive for the disease there are 20% chances that you really have it.This is because the occurance of the disease is very rare. The problem with respect to implementing a universal testing policy for this disease will lead to occurance of more than 20% of false positive cases which can lead to uneccessary worry and medication amongst those who have tested positive.
 
-################################################################################################################# 
-
 Exploratory analysis: green buildings
 -------------------------------------
-
-################################################################################################################# 
 
 First I will start preparing the data in hand.
 
@@ -231,7 +227,9 @@ plot(gb_clean_t1$Both,gb_clean_t1$Rent)
 plot(gb_clean_t1$None,gb_clean_t1$Rent)
 ```
 
-![](Excercise_1_files/figure-markdown_github/unnamed-chunk-11-1.png) *Hence, the Hypothesis above is rejected!*
+![](Excercise_1_files/figure-markdown_github/unnamed-chunk-11-1.png)
+
+*Hence, the Hypothesis above is rejected!*
 
 ***Hypothesis***: Green buildings are usually class a buildings hence will have a higher rent
 
@@ -273,7 +271,9 @@ plot(gb_not_green$hd_total07,gb_not_green$Rent)
 plot(gb_not_green$cd_total_07,gb_not_green$Rent)
 ```
 
-![](Excercise_1_files/figure-markdown_github/unnamed-chunk-13-1.png) After understanding the important variables involved in data it looks like the Excel guru seems to have got it right till now. But... *The excel guru considered 27.6 per square foot per year.However, since the size is going to be around 250k one should choose the median of the rent of buildings around that size.*
+![](Excercise_1_files/figure-markdown_github/unnamed-chunk-13-1.png)
+
+After understanding the important variables involved in data it looks like the Excel guru seems to have got it right till now. But... *The excel guru considered 27.6 per square foot per year.However, since the size is going to be around 250k one should choose the median of the rent of buildings around that size.*
 
 ``` r
 green <- gb_green[which(gb_green$size >= 248000 & gb_green$size >= 252000),]
@@ -315,11 +315,7 @@ median(green_not_stories$Rent)
 
 ***On looking at stories along with size a margin of 2.89 was obtained which is larger than the one stated by EG!*** ***Hence, on building a 13 to 14 storey building with a size of 248k to 252k square foot the estimations and suggestions made by the EG are right if not very accurate. Thus,building a green building will be good idea!***
 
-########################################################################################## 
-
 ### Bootstrapping
-
-########################################################################################## 
 
 ***Part A: the even split: 20% of your assets in each of the five ETFs***
 
@@ -907,7 +903,7 @@ s_q4= quantile(sim1[,n_days], 0.05) - initial_wealth #-3805.049
 
 ***PART C :Aggresive Stocks***
 
-*As evaluated before EEM and VNQ are the aggressive stocks compared to the rest Hence trying out 2 combinations * ***1.Only VNQ(0.5),EEM(0.5)***
+*As evaluated before EEM and VNQ are the aggressive stocks compared to the rest. Hence, trying out 2 combinations * ***1.Only VNQ(0.5),EEM(0.5)***
 
 ``` r
 mystocks = c("VNQ", "EEM")
@@ -1069,11 +1065,7 @@ r_q3 = quantile(sim1[,n_days], 0.05) - initial_wealth #-8682.195
     ## aggressive2 0.65 0.00 0.35 0.00 0.00 -12892.657
     ## aggressive3 0.40 0.05 0.30 0.20 0.05  -8751.633
 
-########################################################################## 
-
 ### Market Segmentation
-
-########################################################################## 
 
 ***Market segments in NutrientH20s twitter followers***
 
