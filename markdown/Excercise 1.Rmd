@@ -3,8 +3,8 @@ title: "STA 380, Part 2: Exercises 1"
 author: "Kirti Pande"
 date: "August 8, 2018"
 output:
-  md_document:
-    variant: markdown_github 
+  github_document:
+    pandoc_args: --webtex
 ---
 
 ```{r setup, include=FALSE}
@@ -39,15 +39,15 @@ p(RC) = 0.3 , p(TC) = 0.7 , p(Y) = 0.65 , p(N) = 0.35
 P(Y|TC) = ?
 
 ***According to Baye's Theorem:***
-p(x|y) = p(y|x)p(x)/p(y)
+$p(x|y) = \frac{p(y|x)p(x)}{p(y)}$
 
 Therefore,
-p(Y|TC) = p(TC|Y)p(Y)/p(TC) 
+$p(Y|TC) = \frac{p(TC|Y)p(Y)}{p(TC)}$ 
  
  *Where:*
 p(TC|Y) = 1 - p(RC|Y)
 
-p(RC|Y) = p(TC|Y)p(Y)/p(TC) 
+$p(RC|Y) = \frac{p(TC|Y)p(Y)}{p(TC)}$ 
 
 p(RC|Y) = (0.3 x 0.5) / 0.65 = 0.23
 
