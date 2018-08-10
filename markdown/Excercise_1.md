@@ -1,3 +1,8 @@
+STA 380, Part 2: Exercises 1
+================
+Kirti Pande
+August 8, 2018
+
 Probability practice
 --------------------
 
@@ -19,13 +24,13 @@ p(RC) = 0.3 , p(TC) = 0.7 , p(Y) = 0.65 , p(N) = 0.35
 
 P(Y|TC) = ?
 
-***According to Baye's Theorem:*** p(x|y) = p(y|x)p(x)/p(y)
+***According to Baye's Theorem:*** ![p(x|y) = \\frac{p(y|x)p(x)}{p(y)}](https://latex.codecogs.com/png.latex?p%28x%7Cy%29%20%3D%20%5Cfrac%7Bp%28y%7Cx%29p%28x%29%7D%7Bp%28y%29%7D "p(x|y) = \frac{p(y|x)p(x)}{p(y)}")
 
-Therefore, p(Y|TC) = p(TC|Y)p(Y)/p(TC)
+Therefore, ![p(Y|TC) = \\frac{p(TC|Y)p(Y)}{p(TC)}](https://latex.codecogs.com/png.latex?p%28Y%7CTC%29%20%3D%20%5Cfrac%7Bp%28TC%7CY%29p%28Y%29%7D%7Bp%28TC%29%7D "p(Y|TC) = \frac{p(TC|Y)p(Y)}{p(TC)}")
 
 *Where:* p(TC|Y) = 1 - p(RC|Y)
 
-p(RC|Y) = p(TC|Y)p(Y)/p(TC)
+![p(RC|Y) = \\frac{p(TC|Y)p(Y)}{p(TC)}](https://latex.codecogs.com/png.latex?p%28RC%7CY%29%20%3D%20%5Cfrac%7Bp%28TC%7CY%29p%28Y%29%7D%7Bp%28TC%29%7D "p(RC|Y) = \frac{p(TC|Y)p(Y)}{p(TC)}")
 
 p(RC|Y) = (0.3 x 0.5) / 0.65 = 0.23
 
@@ -63,15 +68,15 @@ p(D) = 0.000025
 
 P(D|TP) = ?
 
-***According to Baye's Theorem:*** p(x|y) = p(y|x)p(x)/p(y)
+***According to Baye's Theorem:*** ![p(x|y) = \\frac{p(y|x)p(x)}{p(y)}](https://latex.codecogs.com/png.latex?p%28x%7Cy%29%20%3D%20%5Cfrac%7Bp%28y%7Cx%29p%28x%29%7D%7Bp%28y%29%7D "p(x|y) = \frac{p(y|x)p(x)}{p(y)}")
 
-Therefore, p(D|P) = p(P|D)p(D)/p(P)
+Therefore, ![p(D|P) = \\frac{p(P|D)p(D)}{p(P)}](https://latex.codecogs.com/png.latex?p%28D%7CP%29%20%3D%20%5Cfrac%7Bp%28P%7CD%29p%28D%29%7D%7Bp%28P%29%7D "p(D|P) = \frac{p(P|D)p(D)}{p(P)}")
 
 *Where:* p(P) = p(P|D)p(D) + p(P|H)p(H)
 
 p(P|H) = 1- p(N|H)
 
-Therefore, p(D|P) = p(P|D)p(D)/(p(P|D)p(D) + (1 - p(N|H))p(H))
+Therefore, ![p(D|P) = \\frac{p(P|D)p(D)}{p(P|D)p(D) + (1 - p(N|H))p(H)}](https://latex.codecogs.com/png.latex?p%28D%7CP%29%20%3D%20%5Cfrac%7Bp%28P%7CD%29p%28D%29%7D%7Bp%28P%7CD%29p%28D%29%20%2B%20%281%20-%20p%28N%7CH%29%29p%28H%29%7D "p(D|P) = \frac{p(P|D)p(D)}{p(P|D)p(D) + (1 - p(N|H))p(H)}")
 
 ***p(D|P) = (0.993 X 0.000025)/((0.993 X 0.000025) + ((1-0.9999)X(1 - 0.000025))) = 0.1988 ***
 
@@ -82,13 +87,13 @@ Exploratory analysis: green buildings
 
 First I will start preparing the data in hand.
 
-\*\*\*Reading <Data:***>
+***Reading:***
 
 ``` r
 green_buildings = read.csv("../data/green_buildings.csv")
 ```
 
-***Cleaning :***
+***Cleaning:***
 
 NAs present in empl\_gr. Will understand the distribution and carry out missing value treatment.
 
@@ -319,94 +324,11 @@ median(green_not_stories$Rent)
 
 ***Part A: the even split: 20% of your assets in each of the five ETFs***
 
-    ## Loading required package: dplyr
-
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
-
-    ## Loading required package: lattice
-
-    ## Loading required package: ggformula
-
-    ## Loading required package: ggplot2
-
-    ## Loading required package: ggstance
-
-    ## 
-    ## Attaching package: 'ggstance'
-
-    ## The following objects are masked from 'package:ggplot2':
-    ## 
-    ##     geom_errorbarh, GeomErrorbarh
-
-    ## 
-    ## New to ggformula?  Try the tutorials: 
-    ##  learnr::run_tutorial("introduction", package = "ggformula")
-    ##  learnr::run_tutorial("refining", package = "ggformula")
-
-    ## Loading required package: mosaicData
-
-    ## Loading required package: Matrix
-
-    ## 
-    ## The 'mosaic' package masks several functions from core packages in order to add 
-    ## additional features.  The original behavior of these functions should not be affected by this.
-    ## 
-    ## Note: If you use the Matrix package, be sure to load it BEFORE loading mosaic.
-
-    ## 
-    ## Attaching package: 'mosaic'
-
-    ## The following object is masked from 'package:Matrix':
-    ## 
-    ##     mean
-
-    ## The following object is masked from 'package:ggplot2':
-    ## 
-    ##     stat
-
-    ## The following objects are masked from 'package:dplyr':
-    ## 
-    ##     count, do, tally
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     binom.test, cor, cor.test, cov, fivenum, IQR, median,
-    ##     prop.test, quantile, sd, t.test, var
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     max, mean, min, prod, range, sample, sum
-
-    ## Loading required package: xts
-
-    ## Loading required package: zoo
-
-    ## 
-    ## Attaching package: 'zoo'
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     as.Date, as.Date.numeric
-
-    ## 
-    ## Attaching package: 'xts'
-
-    ## The following objects are masked from 'package:dplyr':
-    ## 
-    ##     first, last
-
-    ## Loading required package: TTR
-
-    ## Version 0.4-0 included new data defaults. See ?getSymbols.
+``` r
+# Import a few stocks
+mystocks = c("SPY", "TLT", "LQD","EEM","VNQ")
+getSymbols(mystocks)
+```
 
     ## 'getSymbols' currently uses auto.assign=TRUE by default, but will
     ## use auto.assign=FALSE in 0.5-0. You will still be able to use
@@ -651,7 +573,9 @@ sd(all_returns[,5]) #VNQ
 
 ***Outline your choice of the "safe" and "aggressive" portfolios:*** *Looking at the plots and the standard deviation claculated one can say that the more dynamic stocks are EEM and VNQ.* *These will be considered as the aggressive stocks * *The other 3 i.e. SPY,TLT and LQD do not fluctuate as much as the others hence are considered are safer.*
 
-*So considering 4 combinations of the safer and aggressive stocks with more focus(inc weights) on the safer stocks.* ***1. TLT(0.33), LDQ(0.33) ,SPY(0.34)***
+*So considering 4 combinations of the safer and aggressive stocks with more focus(inc weights) on the safer stocks.*
+
+***1. TLT(0.33), LDQ(0.33) ,SPY(0.34)***
 
 ``` r
 mystocks = c("TLT", "LQD","SPY")
@@ -1563,29 +1487,6 @@ summary(factor(clusthc))
 social_combine2 <- cbind(K2,clusthc)
 
 library(plyr)
-```
-
-    ## -------------------------------------------------------------------------
-
-    ## You have loaded plyr after dplyr - this is likely to cause problems.
-    ## If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
-    ## library(plyr); library(dplyr)
-
-    ## -------------------------------------------------------------------------
-
-    ## 
-    ## Attaching package: 'plyr'
-
-    ## The following object is masked from 'package:mosaic':
-    ## 
-    ##     count
-
-    ## The following objects are masked from 'package:dplyr':
-    ## 
-    ##     arrange, count, desc, failwith, id, mutate, rename, summarise,
-    ##     summarize
-
-``` r
 grouped_hc <- data.frame(aggregate(. ~ clusthc,social_combine2,sum))
 
 valhc <- data.frame(t(grouped_hc))

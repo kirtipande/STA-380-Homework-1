@@ -91,10 +91,10 @@ p(D) = 0.000025
 P(D|TP) = ?
 
 ***According to Baye's Theorem:***
-p(x|y) = p(y|x)p(x)/p(y)
+$p(x|y) = \frac{p(y|x)p(x)}{p(y)}$
 
 Therefore,
-p(D|P) = p(P|D)p(D)/p(P)
+$p(D|P) = \frac{p(P|D)p(D)}{p(P)}$ 
  
  *Where:*
 p(P) = p(P|D)p(D) + p(P|H)p(H)
@@ -102,7 +102,7 @@ p(P) = p(P|D)p(D) + p(P|H)p(H)
 p(P|H) = 1- p(N|H)
 
 Therefore,
-p(D|P) = p(P|D)p(D)/(p(P|D)p(D) + (1 - p(N|H))p(H)) 
+$p(D|P) = \frac{p(P|D)p(D)}{p(P|D)p(D) + (1 - p(N|H))p(H)}$ 
 
 ***p(D|P) = (0.993 X 0.000025)/((0.993 X 0.000025) + ((1-0.9999)X(1 - 0.000025))) = 0.1988 ***
  
@@ -116,11 +116,12 @@ The problem with respect to implementing a universal testing policy for this dis
 
 First I will start preparing the data in hand.
 
-***Reading Data:***
+***Reading:***
 ```{r}
 green_buildings = read.csv("../data/green_buildings.csv")
 ```
-***Cleaning :***
+
+***Cleaning:***
 
 NAs present in empl_gr. Will understand the distribution and carry out missing value treatment.
 ```{r}
@@ -287,17 +288,18 @@ median(green_not_stories$Rent)
 
 
 ***Part A: the even split: 20% of your assets in each of the five ETFs***
-```{r echo=FALSE,results="hidden"}
+```{r echo=FALSE,results="hidden",include=FALSE,message=FALSE}
 library(mosaic)
 library(quantmod)
 library(foreach)
 
-# Import a few stocks
-mystocks = c("SPY", "TLT", "LQD","EEM","VNQ")
-getSymbols(mystocks)
 ```
 
 ```{r}
+
+# Import a few stocks
+mystocks = c("SPY", "TLT", "LQD","EEM","VNQ")
+getSymbols(mystocks)
 
 # Adjust for splits and dividends
 SPYa = adjustOHLC(SPY)
@@ -458,6 +460,7 @@ sd(all_returns[,5]) #VNQ
 *The other 3 i.e. SPY,TLT and LQD do not fluctuate as much as the others hence are considered are safer.*
 
 *So considering 4 combinations of the safer and aggressive stocks with more focus(inc weights) on the safer stocks.*
+
 ***1. TLT(0.33), LDQ(0.33) ,SPY(0.34)***
 
 ```{r}
@@ -859,7 +862,7 @@ plot(1:k.max, wss,
 
 *Running K-means*
 
-```{r}
+```{r message=FALSE}
 # Extract the centers and scales from the rescaled data (which are named attributes)
 mu = attr(X,"scaled:center")
 sigma = attr(X,"scaled:scale")
@@ -966,7 +969,7 @@ The following are the identified individuals/markets :
 *Looking at the above clusters and the plot we can say that there are quite a few correlated features which describe the above clusters.*
 *Hence, in order to remove this sort of correlation Principal Component Analysis is run in order to obtain the set uncorrelated features.*
 
-```{r}
+```{r message=FALSE}
 Y= data.frame(scale(social_df))
 library(ggplot2)
 
@@ -987,7 +990,7 @@ comp <- data.frame(pc2$x[,1:7])
 *Looking at the cumulative proportion from the summary and the scree plot taking 7 Principle Components will explain about 50% of the variability.*
 Here, in the plot we can see how the PCs are projecting on the PC1/PC2 dimension space.
 
-```{r}
+```{r message=FALSE}
 library(ggplot2)
 tweet_scores <- predict(pc2)
 plot(tweet_scores[,1:2], pch=21, bg=terrain.colors(120)[120:1], main="Tweets PC scores")
@@ -1165,7 +1168,7 @@ The clusters can be defined as follows:
 *Looking at the above markets identified, there has been little to none changes when considering only 7 PCs in the previous step.*
 
 *Finally, let's implement Heirarchical clustering and see if there if any difference or occurence of any new market segments.*
-```{r}
+```{r message=FALSE}
 # Heirarchical clustering
 
 K = social_df[-c(1,5,35,36)]
