@@ -1,0 +1,1261 @@
+---
+title: "STA 380, Part 2: Exercises 1"
+author: "Kirti Pande"
+date: "August 8, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Probability practice
+### Part A.
+
+**Visitors to your website are asked to answer a single survey question before they get access to the content on** **the page.**
+**Among all of the users, there are two categories: Random Clicker (RC), and Truthful Clicker (TC).** 
+**There are two possible answers to the survey: yes and no. Random clickers would click either one with equal** **probability.**
+**You are also giving the information that the expected fraction of random clickers is 0.3.**
+**After a trial period, you get the following survey results: 65% said Yes and 35% said No.**
+**What fraction of people who are truthful clickers answered yes?**
+
+#### *Answer:*
+
+TC <- Truthful Clicker
+RC <- Random Clicker
+Y <- Yes
+N <- No
+
+***Given:***
+
+p(Y|RC) = p(N|RC) =  0.5
+
+p(RC) = 0.3 , p(TC) = 0.7 , p(Y) = 0.65 , p(N) = 0.35
+
+***Find out:***
+
+P(Y|TC) = ?
+
+***According to Baye's Theorem:***
+$p(x|y) = \frac{p(y|x)p(x)}{p(y)}$
+
+Therefore,
+$p(Y|TC) = \frac{p(TC|Y)p(Y)}{p(TC)}$ 
+ 
+ *Where:*
+p(TC|Y) = 1 - p(RC|Y)
+
+$p(RC|Y) = \frac{p(TC|Y)p(Y)}{p(TC)}$ 
+
+p(RC|Y) = (0.3 x 0.5) / 0.65 = 0.23
+
+p(TC|Y) = 0.77
+
+Therefore,
+
+***p(Y|TC) = (0.77 x 0.65)/0.7 = 0.715***
+
+------------------------------------------------------------------------------------------------------------------
+
+### Part B.
+
+***Imagine a medical test for a disease with the following two attributes:***
+***The sensitivity is about 0.993. That is, if someone has the disease, there is a probability of 0.993 that*** ***they will test positive.***
+***The specificity is about 0.9999. This means that if someone doesn't have the disease, there is probability*** ***of 0.9999 that they will test negative.***
+***In the general population, incidence of the disease is reasonably rare: about 0.0025% of all people have it***
+***(or 0.000025 as a decimal probability).***
+***Suppose someone tests positive. What is the probability that they have the disease? In light of this*** ***calculation, do you envision any problems in implementing a universal testing policy for the disease?***
+
+#### *Answer:*
+
+P <- Positive test
+
+N <- Negative Test
+
+D <- Disease
+
+H <- Healthy
+
+***Given:***
+
+p(P|D) =  0.993
+
+p(N|H) =  0.9999
+
+p(D) = 0.000025 
+
+***Find out:***
+
+P(D|TP) = ?
+
+***According to Baye's Theorem:***
+$p(x|y) = \frac{p(y|x)p(x)}{p(y)}$
+
+Therefore,
+$p(D|P) = \frac{p(P|D)p(D)}{p(P)}$ 
+ 
+ *Where:*
+p(P) = p(P|D)p(D) + p(P|H)p(H)
+
+p(P|H) = 1- p(N|H)
+
+Therefore,
+$p(D|P) = \frac{p(P|D)p(D)}{p(P|D)p(D) + (1 - p(N|H))p(H)}$ 
+
+***p(D|P) = (0.993 X 0.000025)/((0.993 X 0.000025) + ((1-0.9999)X(1 - 0.000025))) = 0.1988 ***
+ 
+The probability of having a disease given you have tested positive is only 20%
+So even if you have tested positive for the disease there are 20% chances that you really have it.This is because the occurance of the disease is very rare.
+The problem with respect to implementing a universal testing policy for this disease will lead to occurance of more than 20% of false positive cases which can lead to uneccessary worry and medication amongst those who have tested positive.
+
+#################################################################################################################
+## Exploratory analysis: green buildings
+#################################################################################################################
+
+First I will start preparing the data in hand.
+
+***Reading Data:***
+```{r}
+green_buildings = read.csv("C:/Users/kirti/Downloads/MSBA/Introduction to Predictive modelling/Jame Scott assignment/green_buildings.csv")
+```
+***Cleaning :***
+
+NAs present in empl_gr. Will understand the distribution and carry out missing value treatment.
+```{r}
+boxplot(green_buildings$empl_gr)
+```
+
+The distribution has less variance the missing value can be replaced with the mean 
+
+***Replacing NA's:***
+```{r}
+gb_clean <- green_buildings
+gb_clean$empl_gr[is.na(green_buildings$empl_gr)] <- mean(green_buildings$empl_gr)
+```
+
+*Looking at the leasing_rate which even got the Excel guru's(EG) attention!*
+
+EG removed entries which had leasing rates lower than 10% since he was unsure about these buildings
+```{r}
+plot(gb_clean$green_rating,gb_clean$leasing_rate)
+```
+
+Looking at the plot above we can say that
+
+*The entries with less than 10% of the leasing_rate are mostly the non green buildings.* 
+*Removing these rows is acceptable since we are planning to compare the non green withthe green buildings in the future where the later is concentrated around the higher leasing rate.*
+*Also, the concentration of the green rated building around the higher leasing rate margin indicates the better monetary performance of such buildings.*
+*Hence, the EG's decision was right!*
+
+Removing the building entries with less than 10% of the leasing rate
+```{r}
+gb_clean <-gb_clean[which(gb_clean$leasing_rate > 10),]
+```
+
+***Hypothesis*** : Most green buildings are young hence the rent will be higher
+
+***Looking at relationship between age and green_rating***
+
+
+*On running a chi square test(p-value<2.2e-16) and plotting the relationship between age and green status we can see that green rating buildings have a lower age since it's a recent concept.*
+*Hence, if the building has a green status we can automatically assume that it is a young building, making age a confounding variable.*
+
+```{r }
+plot(gb_clean$green_rating,gb_clean$age)
+```
+```{r}
+chisq.test(gb_clean$green_rating,gb_clean$age)
+```
+
+***Looking at the relationship between age and Rent***
+
+We can say that they are not very strongly correlated(-0.103) 
+```{r}
+#Splitting buildings into green and non green
+gb_green <- gb_clean[which(gb_clean$green_rating == 1),]
+gb_not_green <- gb_clean[which(gb_clean$green_rating == 0),]
+a <- nrow(gb_green[which(gb_green$age > 50),])
+b <- nrow(gb_green[which(gb_green$age < 50),])
+a/b
+```
+
+Only 4% of the green buildings are old
+```{r}
+c <- nrow(gb_not_green[which(gb_not_green$age > 50),])
+d <- nrow(gb_not_green[which(gb_not_green$age < 50),])
+c/d
+```
+
+58% of non green buildings are older than 50 years
+
+We can see that as the age is increasing the rent is increasing
+
+```{r}
+plot(gb_clean$Rent,gb_clean$age)
+```
+
+*However,we can see that the green buildings are younger and tend to cost more.Hence age is a confounding variable between the relationship.*
+*Hence,the hypothesis that since green buildings are young the rent will be higher is approved!*
+
+
+***Hypothesis***: Having both green_rating will have higher rent
+
+Looking at the plots generate we can say that the buildings with both the LEED and Energy certification tend to have lower rents, which is surprising! 
+Also,the rent for the green certified building lies mostly within 100 
+```{r}
+#Identifying buildings with both and none of the certificates
+par(mfrow=c(2,2))
+gb_clean_t1 <- gb_clean
+gb_clean_t1$Both <-0
+gb_clean_t1$Both[gb_clean_t1$LEED == 1 & gb_clean_t1$Energystar == 1] <-1
+gb_clean_t1$None <-0
+gb_clean_t1$None[gb_clean_t1$LEED == 0 & gb_clean_t1$Energystar== 0] <-1
+
+nrow(gb_clean[which(gb_clean$LEED ==1),])
+nrow(gb_clean[which(gb_clean$Energystar ==1),])
+nrow(gb_clean_t1[which(gb_clean_t1$Both ==1),])
+par(mfrow=c(2,2))
+plot(gb_clean$LEED,gb_clean$Rent)
+plot(gb_clean$Energystar,gb_clean$Rent)
+plot(gb_clean_t1$Both,gb_clean_t1$Rent)
+plot(gb_clean_t1$None,gb_clean_t1$Rent)
+
+```
+*Hence, the Hypothesis above is rejected!*
+
+***Hypothesis***: Green buildings are usually class a buildings hence will have a higher rent
+
+***Looking at classes of the building***
+```{r}
+nrow(gb_green[which(gb_green$class_a == 1),])
+nrow(gb_green[which(gb_green$class_b == 1),])
+nrow(gb_green)
+```
+Around 80% of the green buildings are class a and the remaining are class b and c
+
+Class a buildings tend to have a higher rent in comparison to the other classes 
+thereby indicating that the class maybe a confounding variable in the relationship between Rent and green rating.
+
+*Hypothesis that green buildings are usually class a and hence will lead to increase in rent is approved!*
+
+
+***Hypothesis***: Increase in cooling degree increase rent for green buildings
+
+*From the below plots we can see that as the cooling degrees tends to increase the rent goes down for green buildings.*
+*The same occurs with non green buildings thereby not providing any substantial insight.*
+*Hence hypothesis is rejected!*
+```{r}
+par(mfrow=c(2,2))
+plot(gb_green$hd_total07,gb_green$Rent)
+plot(gb_green$cd_total_07,gb_green$Rent)
+plot(gb_not_green$hd_total07,gb_not_green$Rent)
+plot(gb_not_green$cd_total_07,gb_not_green$Rent)
+```
+After understanding the important variables involved in data it looks like the Excel guru seems to have got it right till now.
+But...
+*The excel guru considered 27.6 per square foot per year.However, since the size is going to be around 250k one should choose the median of the rent of buildings around that size.*
+```{r}
+green <- gb_green[which(gb_green$size >= 248000 & gb_green$size >= 252000),]
+median(green$Rent)
+not_green <- gb_not_green[which(gb_green$size >= 248000 & gb_green$size >= 252000),]
+median(not_green$Rent)
+```
+
+The difference obtained is 0.13 which is very low and would lead to one making revenue after more than 30 years
+*Thereby proving EG wrong.*
+
+***Let us try to incorporate the stories of the building into our analysis***
+```{r}
+median(green$leasing_rate) #The median occupancy rate for such buildings is around 94%
+
+green_stories <- gb_green[which(gb_green$stories>=13 & gb_green$stories <=17),]
+median(green_stories$Rent)
+green_not_stories <- gb_not_green[which(gb_not_green$stories>=13 & gb_not_green$stories <=17),]
+median(green_not_stories$Rent)
+```
+***On looking at stories along with size a margin of 2.89 was obtained which is larger than the one stated by EG!***
+***Hence, on building a 13 to 14 storey building with a size of 248k to 252k square foot the estimations and suggestions made by the EG are right if not very accurate. Thus,building a green building will be good idea!***
+
+
+##########################################################################################
+###Bootstrapping
+##########################################################################################
+
+***Part A: the even split: 20% of your assets in each of the five ETFs***
+```{r results="hidden"}
+library(mosaic)
+library(quantmod)
+library(foreach)
+
+# Import a few stocks
+mystocks = c("SPY", "TLT", "LQD","EEM","VNQ")
+getSymbols(mystocks)
+```
+
+```{r}
+
+# Adjust for splits and dividends
+SPYa = adjustOHLC(SPY)
+TLTa = adjustOHLC(TLT)
+LQDa = adjustOHLC(LQD)
+EEMa = adjustOHLC(EEM)
+VNQa = adjustOHLC(VNQ)
+
+# Look at close-to-close changes
+par(mfrow=c(3,2))
+plot(ClCl(SPYa))
+plot(ClCl(TLTa))
+plot(ClCl(LQDa))
+plot(ClCl(EEMa))
+plot(ClCl(VNQa))
+# Combine close to close changes in a single matrix
+all_returns = cbind(ClCl(SPYa),ClCl(TLTa),ClCl(LQDa),ClCl(EEMa),ClCl(VNQa))
+all_returns = as.matrix(na.omit(all_returns))
+```
+```{r}
+# These returns can be viewed as draws from the joint distribution
+pairs(all_returns)
+plot(all_returns[,1], type='l')
+```
+```{r}
+# Look at the US domestic equities over time
+plot(all_returns[,5], type='l')
+```
+
+```{r}
+# An autocorrelation plot: nothing there
+acf(all_returns[,5])
+```
+
+```{r}
+# The sample correlation matrix
+cor(all_returns)
+```
+```{r}
+# The sample correlation matrix
+cor(all_returns)
+```
+
+```{r}
+myprices = getSymbols(mystocks, from = "2007-01-01")
+# A chunk of code for adjusting all stocks
+# creates a new object addind 'a' to the end
+# For example, WMT becomes WMTa, etc
+for(ticker in mystocks) {
+  expr = paste0(ticker, "a = adjustOHLC(", ticker, ")")
+  eval(parse(text=expr))
+}
+# Combine all the returns in a matrix
+all_returns = cbind(	ClCl(SPYa),
+                     ClCl(TLTa),
+                     ClCl(LQDa),
+                     ClCl(EEMa),
+                     ClCl(VNQa))
+all_returns = as.matrix(na.omit(all_returns))
+
+# Compute the returns from the closing prices
+pairs(all_returns)
+
+# Sample a random return from the empirical joint distribution
+# This simulates a random day
+return.today = resample(all_returns, 1, orig.ids=FALSE)
+```
+
+```{r}
+# Sample a random return from the empirical joint distribution
+# This simulates a random day
+set.seed(1)
+return.today = resample(all_returns, 1, orig.ids=FALSE)
+
+# Update the value of your holdings
+# Assumes an equal allocation to each asset
+total_wealth = 100000
+my_weights = c(0.2,0.2,0.2, 0.2, 0.2)
+holdings = total_wealth*my_weights
+holdings = holdings*(1 + return.today)
+
+# Compute your new total wealth
+total_wealth = sum(holdings)
+
+# Now loop over four trading weeks
+total_wealth = 100000
+weights = c(0.2, 0.2, 0.2, 0.2, 0.2)
+holdings = weights * total_wealth
+n_days = 20
+wealthtracker = rep(0, n_days) # Set up a placeholder to track total wealth
+for(today in 1:n_days) {
+  return.today = resample(all_returns, 1, orig.ids=FALSE)
+  holdings = holdings + holdings*return.today
+  total_wealth = sum(holdings)
+  holdings = weights * total_wealth
+  wealthtracker[today] = total_wealth
+}
+total_wealth
+```
+
+```{r}
+plot(wealthtracker, type='l')
+
+```
+```{r}
+# Now simulate many different possible scenarios  
+initial_wealth = 100000
+sim1 = foreach(i=1:5000, .combine='rbind') %do% {
+  total_wealth = initial_wealth
+  holdings = weights * total_wealth
+  n_days = 20
+  wealthtracker = rep(0, n_days)
+  for(today in 1:n_days) {
+    return.today = resample(all_returns, 1, orig.ids=FALSE)
+    holdings = holdings + holdings*return.today
+    total_wealth = sum(holdings)
+    holdings = weights * total_wealth
+    wealthtracker[today] = total_wealth
+  }
+  wealthtracker
+}
+```
+
+```{r}
+hist(sim1[,n_days], 25)
+```
+```{r}
+#Profit/Loss
+hist(sim1[,n_days]- initial_wealth, breaks=30)
+```
+
+Calculate 5% value at risk
+
+```{r}
+e_1 = quantile(sim1[,n_days], 0.05) - initial_wealth
+```
+
+***Part B: Safer splits ***
+```{r}
+par(mfrow=c(3,2))
+plot(ClCl(SPYa))
+plot(ClCl(TLTa))
+plot(ClCl(VNQa))
+plot(ClCl(LQDa))
+plot(ClCl(EEMa))
+```
+```{r}
+sd(all_returns[,1]) #SPY
+sd(all_returns[,2]) #EEM
+sd(all_returns[,3]) #TLT
+sd(all_returns[,4]) #LDQ
+sd(all_returns[,5]) #VNQ
+```
+
+***Outline your choice of the "safe" and "aggressive" portfolios:***
+*Looking at the plots and the standard deviation claculated one can say that the more dynamic stocks are EEM and VNQ.*
+*These will be considered as the aggressive stocks *
+*The other 3 i.e. SPY,TLT and LQD do not fluctuate as much as the others hence are considered are safer.*
+
+*So considering 4 combinations of the safer and aggressive stocks with more focus(inc weights) on the safer stocks.*
+***1. TLT(0.33), LDQ(0.33) ,SPY(0.34)***
+
+```{r}
+mystocks = c("TLT", "LQD","SPY")
+getSymbols(mystocks)
+
+# Adjust for splits and dividends
+
+TLTa = adjustOHLC(TLT)
+LQDa = adjustOHLC(LQD)
+VNQa = adjustOHLC(SPY)
+
+# Combine close to close changes in a single matrix
+all_returns = cbind(ClCl(TLTa),ClCl(LQDa),ClCl(SPYa))
+all_returns = as.matrix(na.omit(all_returns))
+
+myprices = getSymbols(mystocks, from = "2007-01-01")
+
+# A chunk of code for adjusting all stocks;creates a new object addind 'a' to the end;For example, WMT becomes WMTa, etc
+for(ticker in mystocks) {
+  expr = paste0(ticker, "a = adjustOHLC(", ticker, ")")
+  eval(parse(text=expr))
+}
+
+# Combine all the returns in a matrix
+all_returns = cbind( ClCl(TLTa),
+                     ClCl(LQDa),
+                     ClCl(SPYa))
+all_returns = as.matrix(na.omit(all_returns))
+
+# Sample a random return from the empirical joint distribution
+set.seed(1)
+# This simulates a random day
+return.today = resample(all_returns, 1, orig.ids=FALSE)
+
+# Simulating many different possible scenarios  
+initial_wealth = 100000
+sim1 = foreach(i=1:5000, .combine='rbind') %do% {
+  total_wealth = initial_wealth
+  weights = c(0.33,0.33,0.34)
+  holdings = weights * total_wealth
+  n_days = 20
+  wealthtracker = rep(0, n_days)
+  for(today in 1:n_days) {
+    return.today = resample(all_returns, 1, orig.ids=FALSE)
+    holdings = holdings + holdings*return.today
+    total_wealth = sum(holdings)
+    holdings = weights * total_wealth
+    wealthtracker[today] = total_wealth
+  }
+  wealthtracker
+}
+
+par(mfrow=c(1,2))
+hist(sim1[,n_days], 25)
+hist(sim1[,n_days]- initial_wealth, breaks=30)
+```
+
+```{r}
+# Calculate 5% value at risk
+s_q1 = quantile(sim1[,n_days], 0.05) - initial_wealth #-3030.64
+```
+
+***2. TLT(0.5), LDQ(0.3) ,SPY(0.2)***
+
+```{r}
+
+# Simulating many different possible scenarios  
+initial_wealth = 100000
+sim1 = foreach(i=1:5000, .combine='rbind') %do% {
+  total_wealth = initial_wealth
+  weights = c(0.5,0.3,0.2)
+  holdings = weights * total_wealth
+  n_days = 20
+  wealthtracker = rep(0, n_days)
+  for(today in 1:n_days) {
+    return.today = resample(all_returns, 1, orig.ids=FALSE)
+    holdings = holdings + holdings*return.today
+    total_wealth = sum(holdings)
+    holdings = weights * total_wealth
+    wealthtracker[today] = total_wealth
+  }
+  wealthtracker
+}
+par(mfrow=c(1,2))
+head(sim1)
+hist(sim1[,n_days], 25)
+
+# Profit/loss
+mean(sim1[,n_days])
+hist(sim1[,n_days]- initial_wealth, breaks=30)
+```
+
+```{r}
+# Calculate 5% value at risk
+s_q2 = quantile(sim1[,n_days], 0.05) - initial_wealth #-3206.11
+
+```
+
+***3. VNQ(0.05),EEM(0.05),TLT(0.4), LDQ(0.3) ,SPY(0.2)***
+
+```{r}
+mystocks = c("VNQ","EEM","TLT","LQD", "SPY")
+myprices = getSymbols(mystocks, from = "2007-01-01")
+
+SPYa = adjustOHLC(SPY)
+TLTa = adjustOHLC(TLT)
+LQDa = adjustOHLC(LQD)
+EEMa = adjustOHLC(EEM)
+VNQa = adjustOHLC(VNQ)
+
+# A chunk of code for adjusting all stocks
+# creates a new object addind 'a' to the end
+# For example, WMT becomes WMTa, etc
+for(ticker in mystocks) {
+  expr = paste0(ticker, "a = adjustOHLC(", ticker, ")")
+  eval(parse(text=expr))
+}
+
+par(mfrow=c(1,2))
+# Combine all the returns in a matrix
+all_returns = cbind( ClCl(VNQa),
+                     ClCl(EEMa),
+                     ClCl(TLTa),
+                     ClCl(LQDa),
+                     ClCl(SPYa))
+
+all_returns = as.matrix(na.omit(all_returns))
+
+# Compute the returns from the closing prices
+pairs(all_returns)
+
+# Sample a random return from the empirical joint distribution
+# This simulates a random day
+return.today = resample(all_returns, 1, orig.ids=FALSE)
+
+# Now simulate many different possible scenarios  
+initial_wealth = 100000
+sim1 = foreach(i=1:5000, .combine='rbind') %do% {
+  total_wealth = initial_wealth
+  weights = c(0.05,0.05,0.4,0.3,0.2)
+  holdings = weights * total_wealth
+  n_days = 20
+  wealthtracker = rep(0, n_days)
+  for(today in 1:n_days) {
+    return.today = resample(all_returns, 1, orig.ids=FALSE)
+    holdings = holdings + holdings*return.today
+    total_wealth = sum(holdings)
+    holdings = weights * total_wealth
+    wealthtracker[today] = total_wealth
+  }
+  wealthtracker
+}
+
+hist(sim1[,n_days], 25)
+
+# Profit/loss
+hist(sim1[,n_days]- initial_wealth, breaks=30)
+```
+
+```{r}
+# Calculate 5% value at risk
+s_q3 = quantile(sim1[,n_days], 0.05) - initial_wealth #-3166.62
+
+```
+
+***4. VNQ(0.1),EEM(0.1),TLT(0.35), LDQ(0.25) ,SPY(0.2)***
+
+```{r}
+initial_wealth = 100000
+sim1 = foreach(i=1:5000, .combine='rbind') %do% {
+  total_wealth = initial_wealth
+  weights = c(0.1,0.1,0.35,0.25,0.2)
+  holdings = weights * total_wealth
+  n_days = 20
+  wealthtracker = rep(0, n_days)
+  for(today in 1:n_days) {
+    return.today = resample(all_returns, 1, orig.ids=FALSE)
+    holdings = holdings + holdings*return.today
+    total_wealth = sum(holdings)
+    holdings = weights * total_wealth
+    wealthtracker[today] = total_wealth
+  }
+  wealthtracker
+}
+par(mfrow=c(1,2))
+
+hist(sim1[,n_days], 25)
+
+# Profit/loss
+hist(sim1[,n_days]- initial_wealth, breaks=30)
+
+# Calculate 5% value at risk
+s_q4= quantile(sim1[,n_days], 0.05) - initial_wealth #-3805.049
+
+```
+
+***Hence, we can say that the combination TLT(0.33), LDQ(0.33) ,SPY(0.34) gives us the best results.***
+
+***PART C :Aggresive Stocks***
+
+*As evaluated before EEM and VNQ are the aggressive stocks compared to the rest
+Hence trying out 2 combinations *
+***1.Only VNQ(0.5),EEM(0.5)***
+
+```{r}
+
+mystocks = c("VNQ", "EEM")
+getSymbols(mystocks)
+
+# Adjust for splits and dividends
+
+SPYa = adjustOHLC(VNQ)
+EEMa = adjustOHLC(EEM)
+
+# Combine close to close changes in a single matrix
+all_returns = cbind(ClCl(VNQa),ClCl(EEMa))
+all_returns = as.matrix(na.omit(all_returns))
+
+mystocks = c("VNQ", "EEM")
+myprices = getSymbols(mystocks, from = "2007-01-01")
+
+
+# A chunk of code for adjusting all stocks
+# creates a new object addind 'a' to the end
+# For example, WMT becomes WMTa, etc
+for(ticker in mystocks) {
+  expr = paste0(ticker, "a = adjustOHLC(", ticker, ")")
+  eval(parse(text=expr))
+}
+
+
+# Combine all the returns in a matrix
+all_returns = cbind( ClCl(VNQa),
+                     ClCl(EEMa))
+all_returns = as.matrix(na.omit(all_returns))
+
+# Sample a random return from the empirical joint distribution
+set.seed(1)
+# This simulates a random day
+return.today = resample(all_returns, 1, orig.ids=FALSE)
+
+
+# Now simulate many different possible scenarios  
+initial_wealth = 100000
+sim1 = foreach(i=1:5000, .combine='rbind') %do% {
+  total_wealth = initial_wealth
+  weights = c(0.5,0.5)
+  holdings = weights * total_wealth
+  n_days = 20
+  wealthtracker = rep(0, n_days)
+  for(today in 1:n_days) {
+    return.today = resample(all_returns, 1, orig.ids=FALSE)
+    holdings = holdings + holdings*return.today
+    total_wealth = sum(holdings)
+    holdings = weights * total_wealth
+    wealthtracker[today] = total_wealth
+  }
+  wealthtracker
+}
+
+# Calculate 5% value at risk
+r_q1=quantile(sim1[,n_days], 0.05) - initial_wealth #-12373.8803
+```
+***2.SPY(0.6),EEM(0.4)***
+```{r}
+# Now simulate many different possible scenarios  
+initial_wealth = 100000
+sim1 = foreach(i=1:5000, .combine='rbind') %do% {
+  total_wealth = initial_wealth
+  weights = c(0.65,0.35)
+  holdings = weights * total_wealth
+  n_days = 20
+  wealthtracker = rep(0, n_days)
+  for(today in 1:n_days) {
+    return.today = resample(all_returns, 1, orig.ids=FALSE)
+    holdings = holdings + holdings*return.today
+    total_wealth = sum(holdings)
+    holdings = weights * total_wealth
+    wealthtracker[today] = total_wealth
+  }
+  wealthtracker
+}
+
+# Calculate 5% value at risk
+r_q2 = quantile(sim1[,n_days], 0.05) - initial_wealth #-12766.605
+```
+*Here we are giving lower preference to TLT,LQD,VNQ compared to SPY and EEM*
+
+***3.VNQ(0.4),EEM(0.3),TLT(0.2),LQD(0.05),SPY(0.05)***
+```{r}
+mystocks = c("VNQ","EEM","TLT","LQD", "SPY")
+myprices = getSymbols(mystocks, from = "2007-01-01")
+
+SPYa = adjustOHLC(SPY)
+TLTa = adjustOHLC(TLT)
+LQDa = adjustOHLC(LQD)
+EEMa = adjustOHLC(EEM)
+VNQa = adjustOHLC(VNQ)
+
+# A chunk of code for adjusting all stocks
+# creates a new object addind 'a' to the end
+# For example, WMT becomes WMTa, etc
+for(ticker in mystocks) {
+  expr = paste0(ticker, "a = adjustOHLC(", ticker, ")")
+  eval(parse(text=expr))
+}
+
+
+# Combine all the returns in a matrix
+all_returns = cbind( ClCl(VNQa),
+                     ClCl(EEMa),
+                     ClCl(TLTa),
+                     ClCl(LQDa),
+                     ClCl(SPYa))
+all_returns = as.matrix(na.omit(all_returns))
+
+# Sample a random return from the empirical joint distribution
+# This simulates a random day
+return.today = resample(all_returns, 1, orig.ids=FALSE)
+
+
+# Now simulate many different possible scenarios  
+initial_wealth = 100000
+sim1 = foreach(i=1:5000, .combine='rbind') %do% {
+  total_wealth = initial_wealth
+  weights = c(0.4,0.3,0.2,0.05,0.05)
+  holdings = weights * total_wealth
+  n_days = 20
+  wealthtracker = rep(0, n_days)
+  for(today in 1:n_days) {
+    return.today = resample(all_returns, 1, orig.ids=FALSE)
+    holdings = holdings + holdings*return.today
+    total_wealth = sum(holdings)
+    holdings = weights * total_wealth
+    wealthtracker[today] = total_wealth
+  }
+  wealthtracker
+}
+
+# Calculate 5% value at risk
+r_q3 = quantile(sim1[,n_days], 0.05) - initial_wealth #-8682.195
+
+```
+
+*Hence we can see that as we incorporate the safer stocks to the set of aggressive stocks we tend to improve the value.*
+
+***Comparing the results for each portfolio in a way that would allow the reader to make an intelligent decision among the three options.***
+
+```{r echo = FALSE}
+table_etf <- matrix(c(0.2,0.2,0.2,0.2,0.2,e_1,0,0.34,0,0.33,0.33,s_q1,0,0.3,0,0.5,0.4,s_q2,0.05,0.2,0.05,0.4,0.3,s_q3,0.1,0.1,0.35,0.25,0.2,s_q4,0.5,0,0.5,0,0,r_q1,0.65,0,0.35,0,0,r_q2,0.4,0.05,0.3,0.2,0.05,r_q3),ncol=6,byrow=TRUE)
+ colnames(table_etf) <- c("VNQ","SPY","EEM","TLT","LQD","Risk%")
+ rownames(table_etf) <- c("equal","safe1","safe2","safe3","safe4","aggressive1","aggressive2","aggressive3")
+
+print(table_etf)
+```
+
+##########################################################################
+###Market Segmentation
+##########################################################################
+***Market segments in NutrientH20s twitter followers***
+
+```{r echo =FALSE,result="hide"}
+library(ggplot2)
+library(LICORS)
+library(foreach)
+library(mosaic)
+
+social_df = read.csv("C:\\Users\\kirti\\Downloads\\MSBA\\Introduction to Predictive modelling\\Jame Scott assignment\\Class\\social_marketing.csv",header=TRUE,row.names=1)
+
+#Removing the spam,chatter,adult and uncategorized columns since they are not required in our analysis
+X = social_df[-c(1,5,35,36)]
+
+#Scaling the data
+X = scale(X, center=TRUE, scale=TRUE)
+
+```
+
+*After filtering out the spam and indecent content, K-means is run to obtain the various market segments present in the data*
+*Will determine the number of clusters by plotting a scree plot. Looking at the plot will choose k = 8*
+```{r results="hidden"}
+
+#Computing kmeans
+set.seed(123)
+
+# Compute and plot wss for k = 2 to k = 20.
+k.max <- 20
+wss <- sapply(1:k.max, 
+              function(k){kmeans(X, k, nstart=50,iter.max = 15 )$tot.withinss})
+```
+```{r}
+plot(1:k.max, wss,
+     type="b", pch = 19, frame = FALSE, 
+     xlab="Number of clusters K",
+     ylab="Total within-clusters sum of squares")
+
+```
+
+*Running K-means*
+
+```{r}
+# Extract the centers and scales from the rescaled data (which are named attributes)
+mu = attr(X,"scaled:center")
+sigma = attr(X,"scaled:scale")
+
+# Run k-means with 8 clusters and 25 starts
+clust1 = kmeans(X, 8, nstart=25)
+social_combine <- cbind(social_df,clust1$cluster)
+cluster_centers <- clust1$center
+
+library(cluster) 
+clusplot(X, clust1$cluster, color=TRUE, shade=TRUE,labels=5, lines=0)
+```
+
+*Understanding the 8 market segments identified*
+
+```{r}
+
+#Understanding how each cluster is defined
+social_clust <- rbind(clust1$center[1,]*sigma + mu,clust1$center[2,]*sigma + mu,clust1$center[3,]*sigma + mu,clust1$center[4,]*sigma + mu,clust1$center[5,]*sigma + mu,clust1$center[6,]*sigma + mu,clust1$center[7,]*sigma + mu,clust1$center[8,]*sigma + mu)
+social_clust <- data.frame(social_clust)
+social_clust
+#Taking the top 5 characterstics of each cluster
+val <- data.frame(t(social_clust))
+names(val)
+
+cluster1 <- val[order(val$X1 ,decreasing=T)[1:5],]
+cluster2 <- val[order(val$X2 ,decreasing=T)[1:5],]
+cluster3 <- val[order(val$X3 ,decreasing=T)[1:5],]
+cluster4 <- val[order(val$X4 ,decreasing=T)[1:5],]
+cluster5 <- val[order(val$X5 ,decreasing=T)[1:5],]
+cluster6 <- val[order(val$X6 ,decreasing=T)[1:5],]
+cluster7 <- val[order(val$X7 ,decreasing=T)[1:5],]
+cluster8 <- val[order(val$X8 ,decreasing=T)[1:5],]
+
+
+cluster1d <- val[order(val$X1 ,decreasing=F)[1:5],]
+cluster2d<- val[order(val$X2 ,decreasing=F)[1:5],]
+cluster3d <- val[order(val$X3 ,decreasing=F)[1:5],]
+cluster4d <- val[order(val$X4 ,decreasing=F)[1:5],]
+cluster5d <- val[order(val$X5 ,decreasing=F)[1:5],]
+cluster6d <- val[order(val$X6 ,decreasing=F)[1:5],]
+cluster7d <- val[order(val$X7 ,decreasing=F)[1:5],]
+cluster8d <- val[order(val$X8 ,decreasing=F)[1:5],]
+
+
+#plotting the characterstics defining each cluster
+par(mfrow=c(4,2))
+
+barplot(cluster1$X1, main="CLUSTER 1", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster1),
+        border="red")
+barplot(cluster1d$X1, main="CLUSTER 1", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster1d),
+        border="red")
+
+barplot(cluster2$X2, main="CLUSTER 2", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2),
+        border="red")
+barplot(cluster2d$X2, main="CLUSTER 2", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2d),
+        border="red")
+
+barplot(cluster3$X3, main="CLUSTER 3", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster3),
+        border="red")
+barplot(cluster3d$X3, main="CLUSTER 3", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster3d),
+        border="red")
+
+barplot(cluster4$X4, main="CLUSTER 4", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster4),
+        border="red")
+barplot(cluster4d$X4, main="CLUSTER 4", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster4d),
+        border="red")
+
+barplot(cluster5$X5, main="CLUSTER 5", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster5),
+        border="red")
+barplot(cluster5d$X5, main="CLUSTER 5", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster5d),
+        border="red")
+
+barplot(cluster6$X6, main="CLUSTER 6", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster6),
+        border="red")
+barplot(cluster6d$X6, main="CLUSTER 6", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster6d),
+        border="red")
+
+barplot(cluster7$X7, main="CLUSTER 7", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster7),
+        border="red")
+barplot(cluster7d$X7, main="CLUSTER 7", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster7d),
+        border="red")
+
+barplot(cluster8$X8, main="CLUSTER 8", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster8),
+        border="red")
+
+barplot(cluster8d$X8, main="CLUSTER 8", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster8d),
+        border="red")
+
+```
+
+*Looking at the plots above , where for each cluster the top and bottom tweet categories are listed, we can understand the kind of market the individualsfall into.*
+The following are the identified individuals/markets :
+-Beauty/Fashion blogging
+-College students(mostly boys)
+-Media/Art students
+=Politically inclined 
+-Fitness blogging
+-Journalistic blogging
+-Other shops/stores
+-Family oriented
+
+
+*Looking at the above clusters and the plot we can say that there are quite a few correlated features which describe the above clusters.*
+*Hence, in order to remove this sort of correlation Principal Component Analysis is run in order to obtain the set uncorrelated features.*
+
+```{r}
+Y= data.frame(scale(social_df))
+library(ggplot2)
+
+# Normalize phrase counts to phrase frequencies
+Z = Y/rowSums(Y)
+# PCA
+pc2 = prcomp(Y, scale=TRUE)
+
+#Looking at the cumulative proportion from the summary and the scree plot taking 7 PCs will explain about 50% of the variability
+summary(pc2)
+plot(pc2,type='l')
+
+#Choosing 7 PCs
+comp <- data.frame(pc2$x[,1:7])
+
+```
+*Looking at the cumulative proportion from the summary and the scree plot taking 7 Principle Components will explain about 50% of the variability.*
+Here, in the plot we can see how the PCs are projecting on the PC1/PC2 dimension space.
+```{r}
+library(ggplot2)
+tweet_scores <- predict(pc2)
+plot(tweet_scores[,1:2], pch=21, bg=terrain.colors(120)[120:1], main="Tweets PC scores")
+legend("topright", fill=terrain.colors(7),
+        legend=c("1","2","3","4","5","6","7"), bty="n", cex=0.75)
+```
+
+Since this plot and similar ones across different PC dimensions will not not give us relevant results.We can overcome the correlation issue in kmeans by feeding the 7 PCs selected into it.
+
+The clusters and their descriptions after running k means is as shown below:
+```{r}
+#Running K means with the components generated after running PCA
+clust2 = kmeans(comp, 8, nstart=25)
+
+#The cluster centers shows by how much each cluster is defined by the PCs obtained
+#Generating the bar plots just like how I did them for k means alone
+social_clust2 <- rbind(clust2$center[1,]*sigma + mu,clust2$center[2,]*sigma + mu,clust2$center[3,]*sigma + mu,clust2$center[4,]*sigma + mu,clust2$center[5,]*sigma + mu,clust2$center[6,]*sigma + mu,clust2$center[7,]*sigma + mu,clust2$center[8,]*sigma + mu)
+social_clust2 <- data.frame(social_clust2)
+
+val2 <- data.frame(t(social_clust2))
+cluster2_1 <- val2[order(val2$X1 ,decreasing=T)[1:5],]
+cluster2_2 <- val2[order(val2$X2 ,decreasing=T)[1:5],]
+cluster2_3 <- val2[order(val2$X3 ,decreasing=T)[1:5],]
+cluster2_4 <- val2[order(val2$X4 ,decreasing=T)[1:5],]
+cluster2_5 <- val2[order(val2$X5 ,decreasing=T)[1:5],]
+cluster2_6 <- val2[order(val2$X6 ,decreasing=T)[1:5],]
+cluster2_7 <- val2[order(val2$X7 ,decreasing=T)[1:5],]
+cluster2_8 <- val2[order(val2$X8 ,decreasing=T)[1:5],]
+
+
+cluster2_1d <- val2[order(val2$X1 ,decreasing=F)[1:5],]
+cluster2_2d <- val2[order(val2$X2 ,decreasing=F)[1:5],]
+cluster2_3d <- val2[order(val2$X3 ,decreasing=F)[1:5],]
+cluster2_4d <- val2[order(val2$X4 ,decreasing=F)[1:5],]
+cluster2_5d <- val2[order(val2$X5 ,decreasing=F)[1:5],]
+cluster2_6d <- val2[order(val2$X6 ,decreasing=F)[1:5],]
+cluster2_7d <- val2[order(val2$X7 ,decreasing=F)[1:5],]
+cluster2_8d <- val2[order(val2$X8 ,decreasing=F)[1:5],]
+
+par(mfrow=c(4,2))
+
+barplot(cluster2_1$X1, main="CLUSTER 1", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2_1),
+        border="red")
+barplot(cluster2_1d$X1, main="CLUSTER 1", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2_1d),
+        border="red")
+
+barplot(cluster2_2$X2, main="CLUSTER 2", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2_2),
+        border="red")
+barplot(cluster2_2d$X2, main="CLUSTER 2", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2_2d),
+        border="red")
+
+barplot(cluster2_3$X3, main="CLUSTER 3", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2_3),
+        border="red")
+barplot(cluster2_3d$X3, main="CLUSTER 3", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2_3d),
+        border="red")
+
+barplot(cluster2_4$X4, main="CLUSTER 4", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2_4),
+        border="red")
+barplot(cluster2_4d$X4, main="CLUSTER 4", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2_4d),
+        border="red")
+
+barplot(cluster2_5$X5, main="CLUSTER 5", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2_5),
+        border="red")
+barplot(cluster2_5d$X5, main="CLUSTER 5", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2_5d),
+        border="red")
+
+barplot(cluster2_6$X6, main="CLUSTER 6", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2_6),
+        border="red")
+barplot(cluster2_6d$X6, main="CLUSTER 6", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2_6d),
+        border="red")
+
+barplot(cluster2_7$X7, main="CLUSTER 7", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2_7),
+        border="red")
+barplot(cluster2_7d$X7, main="CLUSTER 7", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2_7d),
+        border="red")
+
+barplot(cluster2_8$X8, main="CLUSTER 8", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2_8),
+        border="red")
+barplot(cluster2_8d$X8, main="CLUSTER 8", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2_8d),
+        border="red")
+```
+
+The following are assumptions about the market groups based on their tweet counts :
+1.Otakus(Japanese culture identifies them as gamers who lack social skills)
+2.Food/cooking bloggers
+3.College students
+4.Working adults
+5.Nutrition
+6.Not politically/religiously inclined
+7.Fitness/Excercise
+8.Political
+
+The K means in this case seems to have missed out other defining variables. This maybe due to the low number of PCs selected. Maybe increasing the PCs selected to 20 may generate better defined clusters.
+
+However, this time we will feed these components into the kmeans++ algorithm for improved results.
+```{r}
+comp2 <- data.frame(pc2$x[,1:20])
+clustpp = kmeanspp(X, k=8, nstart=25)
+
+social_clustpp <- rbind(clustpp$center[1,]*sigma + mu,clustpp$center[2,]*sigma + mu,clustpp$center[3,]*sigma + mu,clustpp$center[4,]*sigma + mu,clustpp$center[5,]*sigma + mu,clustpp$center[6,]*sigma + mu,clustpp$center[7,]*sigma + mu,clustpp$center[8,]*sigma + mu)
+social_clustpp <- data.frame(social_clustpp)
+
+valpp <- data.frame(t(social_clustpp))
+cluster2pp_1 <- valpp[order(valpp$X1 ,decreasing=T)[1:5],]
+cluster2pp_2 <- valpp[order(valpp$X2 ,decreasing=T)[1:5],]
+cluster2pp_3 <- valpp[order(valpp$X3 ,decreasing=T)[1:5],]
+cluster2pp_4 <- valpp[order(valpp$X4 ,decreasing=T)[1:5],]
+cluster2pp_5 <- valpp[order(valpp$X5 ,decreasing=T)[1:5],]
+cluster2pp_6 <- valpp[order(valpp$X6 ,decreasing=T)[1:5],]
+cluster2pp_7 <- valpp[order(valpp$X7 ,decreasing=T)[1:5],]
+cluster2pp_8 <- valpp[order(valpp$X8 ,decreasing=T)[1:5],]
+
+cluster2pp_1d <- valpp[order(valpp$X1 ,decreasing=F)[1:5],]
+cluster2pp_2d <- valpp[order(valpp$X2 ,decreasing=F)[1:5],]
+cluster2pp_3d <- valpp[order(valpp$X3 ,decreasing=F)[1:5],]
+cluster2pp_4d <- valpp[order(valpp$X4 ,decreasing=F)[1:5],]
+cluster2pp_5d <- valpp[order(valpp$X5 ,decreasing=F)[1:5],]
+cluster2pp_6d <- valpp[order(valpp$X6 ,decreasing=F)[1:5],]
+cluster2pp_7d <- valpp[order(valpp$X7 ,decreasing=F)[1:5],]
+cluster2pp_8d <- valpp[order(valpp$X8 ,decreasing=F)[1:5],]
+
+par(mfrow=c(4,2))
+
+barplot(cluster2pp_1$X1, main="CLUSTER 1", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2pp_1),
+        border="red")
+barplot(cluster2pp_1d$X1, main="CLUSTER 1", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2pp_1d),
+        border="red")
+
+barplot(cluster2pp_2$X2, main="CLUSTER 2", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2pp_2),
+        border="red")
+barplot(cluster2pp_2d$X2, main="CLUSTER 2", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2pp_2d),
+        border="red")
+
+barplot(cluster2pp_3$X3, main="CLUSTER 3", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2pp_3),
+        border="red")
+barplot(cluster2pp_3d$X3, main="CLUSTER 3", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2pp_3d),
+        border="red")
+
+barplot(cluster2pp_4$X4, main="CLUSTER 4", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2pp_4),
+        border="red")
+barplot(cluster2pp_4d$X4, main="CLUSTER 4", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2pp_4d),
+        border="red")
+
+barplot(cluster2pp_5$X5, main="CLUSTER 5", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2pp_5),
+        border="red")
+barplot(cluster2pp_5d$X5, main="CLUSTER 5", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2pp_5d),
+        border="red")
+
+barplot(cluster2pp_6$X6, main="CLUSTER 6", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2pp_6),
+        border="red")
+barplot(cluster2pp_6d$X6, main="CLUSTER 6", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2pp_6d),
+        border="red")
+
+barplot(cluster2pp_7$X7, main="CLUSTER 7", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2pp_7),
+        border="red")
+barplot(cluster2pp_7d$X7, main="CLUSTER 7", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2pp_7d),
+        border="red")
+
+barplot(cluster2pp_8$X8, main="CLUSTER 8", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2pp_8),
+        border="red")
+barplot(cluster2pp_8d$X8, main="CLUSTER 8", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(cluster2pp_8d),
+        border="red")
+```
+
+The clusters can be defined as follows:
+1.Teenagers
+2.Food/Cooking
+3.College students
+4.Working adults
+5.Fitness
+6.No politics/religion
+7.Travel
+8.Politics
+
+*Looking at the above markets identified, there has been little to none changes when considering only 7 PCs in the previous step.*
+
+*Finally, let's implement Heirarchical clustering and see if there if any difference or occurence of any new market segments.*
+```{r}
+# Heirarchical clustering
+
+K = social_df[-c(1,5,35,36)]
+K = scale(K, center=TRUE, scale=TRUE)
+distance_matrix = dist(K)
+
+# Now run hierarchical clustering
+hc_tweet = hclust(distance_matrix, method='complete')
+
+# Cut the tree into 5 clusters
+clusthc = cutree(hc_tweet, k=8)
+K2 = social_df[-c(1,5,35,36)]
+summary(factor(clusthc))
+social_combine2 <- cbind(K2,clusthc)
+
+library(plyr)
+grouped_hc <- data.frame(aggregate(. ~ clusthc,social_combine2,sum))
+
+valhc <- data.frame(t(grouped_hc))
+clusterhc_1 <- valhc[order(valhc$X1 ,decreasing=T)[1:5],]
+clusterhc_2 <- valhc[order(valhc$X2 ,decreasing=T)[1:5],]
+clusterhc_3 <- valhc[order(valhc$X3 ,decreasing=T)[1:5],]
+clusterhc_4 <- valhc[order(valhc$X4 ,decreasing=T)[1:5],]
+clusterhc_5 <- valhc[order(valhc$X5 ,decreasing=T)[1:5],]
+clusterhc_6 <- valhc[order(valhc$X6 ,decreasing=T)[1:5],]
+clusterhc_7 <- valhc[order(valhc$X7 ,decreasing=T)[1:5],]
+clusterhc_8 <- valhc[order(valhc$X8 ,decreasing=T)[1:5],]
+
+clusterhcd_1 <- valhc[order(valhc$X1 ,decreasing=F)[1:5],]
+clusterhcd_2 <- valhc[order(valhc$X2 ,decreasing=F)[1:5],]
+clusterhcd_3 <- valhc[order(valhc$X3 ,decreasing=F)[1:5],]
+clusterhcd_4 <- valhc[order(valhc$X4 ,decreasing=F)[1:5],]
+clusterhcd_5 <- valhc[order(valhc$X5 ,decreasing=F)[1:5],]
+clusterhcd_6 <- valhc[order(valhc$X6 ,decreasing=F)[1:5],]
+clusterhcd_7 <- valhc[order(valhc$X7 ,decreasing=F)[1:5],]
+clusterhcd_8 <- valhc[order(valhc$X8 ,decreasing=F)[1:5],]
+
+par(mfrow=c(4,2))
+
+barplot(clusterhc_1$X1, main="CLUSTER 1", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(clusterhc_1),
+        border="red")
+barplot(clusterhcd_1$X1, main="CLUSTER 1", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(clusterhcd_1),
+        border="red")
+
+barplot(clusterhc_2$X2, main="CLUSTER 2", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(clusterhc_2),
+        border="red")
+barplot(clusterhcd_2$X2, main="CLUSTER 2", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(clusterhcd_2),
+        border="red")
+
+barplot(clusterhc_3$X3, main="CLUSTER 3", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(clusterhc_3),
+        border="red")
+barplot(clusterhcd_3$X3, main="CLUSTER 3", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(clusterhcd_3),
+        border="red")
+
+barplot(clusterhc_4$X4, main="CLUSTER 4", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(clusterhc_4),
+        border="red")
+barplot(clusterhcd_4$X4, main="CLUSTER 4", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(clusterhcd_4),
+        border="red")
+
+barplot(clusterhc_5$X5, main="CLUSTER 5", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(clusterhc_5),
+        border="red")
+barplot(clusterhcd_5$X5, main="CLUSTER 5", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(clusterhcd_5),
+        border="red")
+
+barplot(clusterhc_6$X6, main="CLUSTER 6", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(clusterhc_6),
+        border="red")
+barplot(clusterhcd_6$X6, main="CLUSTER 6", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(clusterhcd_6),
+        border="red")
+
+barplot(clusterhc_7$X7, main="CLUSTER 7", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(clusterhc_7),
+        border="red")
+barplot(clusterhcd_7$X7, main="CLUSTER 7", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(clusterhcd_7),
+        border="red")
+
+barplot(clusterhc_8$X8, main="CLUSTER 8", xlab="TOP CATEGORIES", ylab="FREQ", names.arg=row.names(clusterhc_8),
+        border="red")
+barplot(clusterhcd_8$X8, main="CLUSTER 8", xlab="BOTTOM CATEGORIES", ylab="FREQ", names.arg=row.names(clusterhcd_8),
+        border="red")
+
+```
+
+The market segments obtained by Heirarchical clustering are:
+1.Health/Nutrition
+2.Art/Movies
+3.Family
+4.Lifestyle
+5.Journalism
+6.College students
+7.Dating/Romance
+8.Politics
+
+***Looks like heirarchical clustering gave us the finest clusters, keeping aside the cluster 5 & 8 being quite similar.***
+***Hence the accounts which follow the NutrientH20 on twitter based on their tweets fall into 7 different types of demographies namely:***
+Health & Fitness oriented
+Art/Movies enthusiasts
+Family 
+Lifestyle bloggers
+Politics/News
+College Students
+Dating/Romance 
+***Based on the kind of campaign NutrientH20 decides to run it can target the respective demographies for advertising and loyalty purposes.***
